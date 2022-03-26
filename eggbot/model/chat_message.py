@@ -6,6 +6,7 @@ import dataclasses
 class ChatMessage:
     """Abstracts details of a chat message from Discord provider."""
 
-    sender_id: str
+    member_id: str
+    channel_id: str
     created_at: str
     raw_message: str

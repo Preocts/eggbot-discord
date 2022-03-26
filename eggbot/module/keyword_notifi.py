@@ -22,12 +22,16 @@ class KeywordNotifi:
     config_section = "keyword_notifi"
 
     def __init__(self) -> None:
-        self.config: dict[str, KeywordNotifiConfig] = {}
+        self.configs: dict[str, KeywordNotifiConfig] = {}
 
     # Interface
     def process_message(self, message: ChatMessage) -> bool:
         """Process chat message."""
-        # TODO: Build
+        for config in self.configs.values():
+            mention = f"<@{config.member_id}>"
+            result = config.pattern.search(message.raw_message)
+            if result or mention in message.raw_message:
+                return True
         return False
 
     # Interface
@@ -42,7 +46,7 @@ class KeywordNotifi:
             None
         """
         # Reset state config
-        self.config = {}
+        self.configs = {}
 
         try:
             members = config[self.config_section]
@@ -50,9 +54,9 @@ class KeywordNotifi:
             raise KeyError(f"Config file missing expected key '{err}'") from err
 
         for member in members:
-            self.config[member["member_id"]] = KeywordNotifiConfig(
+            self.configs[member["member_id"]] = KeywordNotifiConfig(
                 member_id=member["member_id"],
-                pattern=re.compile(member["pattern"], re.I),
+                pattern=re.compile(rf"\b{member['pattern'].lower()}\b", re.I),
                 enabled=member["enabled"],
                 block_list=member["block_list"],
             )
