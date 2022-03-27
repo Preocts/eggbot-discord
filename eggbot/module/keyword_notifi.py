@@ -1,9 +1,13 @@
 """Alert, via DM, from bot when keyword is said in monitored channels."""
+from __future__ import annotations
+
 import dataclasses
 import re
 from typing import Any
 
 from eggbot.model.chat_message import ChatMessage
+from eggbot.model.chat_response import ChatResponse
+from eggbot.module.chat_module_intf import ChatModuleIntf
 
 
 @dataclasses.dataclass(frozen=True)
@@ -16,7 +20,7 @@ class KeywordNotifiConfig:
     block_list: list[str]
 
 
-class KeywordNotifi:
+class KeywordNotifi(ChatModuleIntf):
     """Alert, via DM, from bot on keyword mention in chat message."""
 
     config_section = "keyword_notifi"
@@ -24,17 +28,15 @@ class KeywordNotifi:
     def __init__(self) -> None:
         self.configs: dict[str, KeywordNotifiConfig] = {}
 
-    # Interface
-    def process_message(self, message: ChatMessage) -> bool:
-        """Process chat message."""
+    def process_message(self, message: ChatMessage) -> ChatResponse | None:
+        """Process chat message, returns response or None if no response exists"""
         for config in self.configs.values():
             mention = f"<@{config.member_id}>"
             result = config.pattern.search(message.raw_message)
             if result or mention in message.raw_message:
-                return True
-        return False
+                return ChatResponse()
+        return None
 
-    # Interface
     def load_config(self, config: dict[str, Any]) -> None:
         """
         Load config into class, removes existing loaded config values.
