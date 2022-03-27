@@ -1,5 +1,4 @@
 import random
-from ast import literal_eval
 from datetime import datetime
 from typing import Any
 from typing import Generator
@@ -15,6 +14,8 @@ random.seed()
 MEMBER_ID = "12345678901234567"
 CHANNEL_ID = "01234567890123456"
 MATCH_PATTERN = "Jeff(erson|)"
+MATCH_WORD01 = "Jefferson"
+MATCH_WORD02 = "Jeff"
 
 
 def mock_configs(size: int) -> dict[str, Any]:
@@ -54,10 +55,11 @@ def module() -> Generator[KeywordNotifi, None, None]:
     (
         ("you don't have to test all your code, only the parts that you want to work.", False),
         ("bent pipes <>, curly bois {}, staples [], pillows (), from-the-windows, to-the-walls /", False),
-        ("Jefferson is a icon of the USD currency", True),
-        ("It wasn't like Jeff had any choice", True),
-        ("This is a weirdjefferson sentance", False),
-        ("Hey <@12345678901234567>, you vibin'?", True),
+        (f"{MATCH_WORD01} is a icon of the USD currency", True),
+        (f"One could say {MATCH_WORD01}'s is the icon", True),
+        (f"It wasn't like {MATCH_WORD02} had any choice", True),
+        (f"This is a weird{MATCH_WORD01} sentance", False),
+        (f"Hey <@{MEMBER_ID}>, you vibin'?", True),
     ),
 )
 # fmt: on
