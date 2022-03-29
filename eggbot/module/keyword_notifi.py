@@ -18,6 +18,7 @@ class KeywordNotifiConfig:
     pattern: re.Pattern[str]
     enabled: bool
     block_list: list[str]
+    delivery_id: str | None = None
 
 
 class KeywordNotifi(ChatModuleIntf):
@@ -34,8 +35,22 @@ class KeywordNotifi(ChatModuleIntf):
             mention = f"<@{config.member_id}>"
             result = config.pattern.search(message.raw_message)
             if result or mention in message.raw_message:
-                return ChatResponse()
+                return ChatResponse(
+                    message=self.render_message(message),
+                    target_id=config.member_id,
+                    delivery_id=config.delivery_id,
+                )
         return None
+
+    def render_message(self, message: ChatMessage) -> str:
+        """Renders text for response"""
+        # TODO: Consider embed
+        text = [
+            f"`Keyword mention in <#{message.channel_id}` from <@{message.member_id}>",
+            "---",
+            f"{message.raw_message}",
+        ]
+        return "\n".join(text)
 
     def load_config(self, config: dict[str, Any]) -> None:
         """
