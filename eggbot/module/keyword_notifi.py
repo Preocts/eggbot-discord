@@ -43,7 +43,15 @@ class KeywordNotifi(ChatModuleIntf):
         return None
 
     def render_message(self, message: ChatMessage) -> str:
-        """Renders text for response"""
+        """
+        Renders text for response.
+
+        Args:
+            message: ChatMessage object for rendering
+
+        Returns:
+            Formatted string for response message
+        """
         # TODO: Consider embed
         text = [
             f"`Keyword mention in <#{message.channel_id}` from <@{message.member_id}>",
