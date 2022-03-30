@@ -5,6 +5,7 @@ black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://gith
 status](https://results.pre-commit.ci/badge/github/Preocts/eggbot-discord/main.svg)](https://results.pre-commit.ci/latest/github/Preocts/eggbot-discord/main)
 [![Python
 package](https://github.com/Preocts/eggbot-discord/actions/workflows/python-tests.yml/badge.svg?branch=main)](https://github.com/Preocts/eggbot-discord/actions/workflows/python-tests.yml)
+[![codecov](https://codecov.io/gh/Preocts/eggbot-discord/branch/main/graph/badge.svg?token=svS9AyHeAC)](https://codecov.io/gh/Preocts/eggbot-discord)
 
 # {{Module Name}}
 

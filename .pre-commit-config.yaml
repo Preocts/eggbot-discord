@@ -1,3 +1,5 @@
+default_language_version:
+  python: python3.9
 repos:
   # Batch of helpful formatters and patterns
   - repo: https://github.com/pre-commit/pre-commit-hooks
