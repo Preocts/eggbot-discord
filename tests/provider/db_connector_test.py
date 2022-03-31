@@ -15,10 +15,7 @@ DB_FILE = ":memory:"
 @pytest.fixture
 def provider() -> Generator[DBConnector, None, None]:
     conn = DBConnector(DB_URL, DB_USER, DB_PASSWORD, port=DB_PORT)
-    try:
-        yield conn
-    finally:
-        conn.close_all()
+    yield conn
 
 
 def test_init(provider: DBConnector) -> None:

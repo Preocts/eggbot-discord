@@ -86,3 +86,8 @@ def test_load_config(size: int, module: KeywordNotifi) -> None:
     module.load_config(config)
 
     assert len(module.configs) == size
+
+
+def test_load_config_failure(module: KeywordNotifi) -> None:
+    with pytest.raises(KeyError, match="Config file missing"):
+        module.load_config({})

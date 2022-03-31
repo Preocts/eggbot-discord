@@ -54,12 +54,6 @@ class DBConnector:
         self.port = port
         self._active: dict[str, _ActiveConnections] = {}
 
-    def close_all(self) -> None:
-        """Close active open DB connections"""
-        for active in self._active.values():
-            active.connection.close()
-        self._active = {}
-
     @contextlib.contextmanager
     def get_connection(
         self,
