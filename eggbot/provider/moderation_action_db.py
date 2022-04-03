@@ -4,11 +4,12 @@ import datetime
 from typing import Any
 from uuid import uuid4
 
+from eggbot.model.db_store_intfc import DBStoreIntfc
 from eggbot.model.moderation_action import ModerationAction
 from eggbot.provider.db_connector import DBConnection
 
 
-class ModerationAction_DB:
+class ModerationAction_DB(DBStoreIntfc):
 
     IntegrityError = DBConnection.IntegrityError
 

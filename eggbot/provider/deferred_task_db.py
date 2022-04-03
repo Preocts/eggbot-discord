@@ -5,11 +5,12 @@ import json
 from typing import Any
 from uuid import uuid4
 
+from eggbot.model.db_store_intfc import DBStoreIntfc
 from eggbot.model.deferred_task import DeferredTask
 from eggbot.provider.db_connector import DBConnection
 
 
-class DeferredTaskDB:
+class DeferredTaskDB(DBStoreIntfc):
 
     IntegrityError = DBConnection.IntegrityError
 
