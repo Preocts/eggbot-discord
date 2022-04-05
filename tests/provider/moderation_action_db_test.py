@@ -114,3 +114,19 @@ def test_deactivate_action(provider: ModerationActionDB) -> None:
 
     assert row.active is True
     assert verify.active is False
+
+
+def test_get_by_id_active(provider: ModerationActionDB) -> None:
+    count = 10
+    for _ in range(count):
+        provider.save(EVENT)
+    uid = provider.get()[-1].uid
+    provider.deactivate(uid)
+
+    all_results = provider.get_by_id("egg")
+    active_results = provider.get_by_id("egg", True)
+    inactive_results = provider.get_by_id("egg", False)
+
+    assert len(all_results) == count
+    assert len(active_results) == count - 1
+    assert len(inactive_results) == 1

@@ -87,6 +87,9 @@ class ModerationActionDB(DBStoreIntfc):
 
         Args:
             action: Optional filter as to the type of action to return
+
+        Returns:
+            List of ModerationAction objects discovered, can be empty
         """
         if action:
             sql = "SELECT * FROM moderation_action WHERE action=?"
@@ -94,6 +97,35 @@ class ModerationActionDB(DBStoreIntfc):
         else:
             sql = "SELECT * FROM moderation_action"
             values = []
+
+        cursor = self.dbconn.cursor()
+        try:
+            cursor.execute(sql, values)
+            return self._to_model(cursor.fetchall())
+        finally:
+            cursor.close()
+
+    def get_by_id(
+        self,
+        member_id: str,
+        active: bool | None = None,
+    ) -> list[ModerationAction]:
+        """
+        Return moderation action by member id from database
+
+        Args:
+            member_id: Member ID to return
+            active: If true or false, filter by (in)active actions else all actions
+
+        Returns:
+            List of ModerationAction objects discovered, can be empty
+        """
+        if active is not None:
+            sql = "SELECT * FROM moderation_action WHERE active=? and member_id=?"
+            values = [active, member_id]
+        else:
+            sql = "SELECT * FROM moderation_action WHERE member_id=?"
+            values = [member_id]
 
         cursor = self.dbconn.cursor()
         try:
