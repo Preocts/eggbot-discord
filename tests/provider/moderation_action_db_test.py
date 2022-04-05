@@ -1,4 +1,5 @@
 import sqlite3
+import time
 from typing import Generator
 
 import pytest
@@ -94,6 +95,7 @@ def test_delete(provider: ModerationActionDB) -> None:
 
 def test_update_event(provider: ModerationActionDB) -> None:
     provider.save(EVENT)
+    time.sleep(1)  # Here because Windows timestamps will actually match otherwise
     row = provider.get()[0]
 
     provider.update(row.uid, "This is a new message")
