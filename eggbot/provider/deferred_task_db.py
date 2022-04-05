@@ -56,9 +56,6 @@ class DeferredTaskDB(DBStoreIntfc):
 
         Returns:
             None
-
-        Raises:
-            KeyError: Missing `event_type` key in event
         """
         now = datetime.datetime.utcnow()
         after = now + datetime.timedelta(seconds=retry_after)
