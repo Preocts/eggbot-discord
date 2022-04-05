@@ -9,7 +9,7 @@ from eggbot.model.moderation_action import ModerationAction
 from eggbot.provider.db_connector import DBConnection
 
 
-class ModerationAction_DB(DBStoreIntfc):
+class ModerationActionDB(DBStoreIntfc):
 
     IntegrityError = DBConnection.IntegrityError
 
@@ -23,7 +23,7 @@ class ModerationAction_DB(DBStoreIntfc):
         """Build table if needed"""
         sql = (
             "CREATE TABLE IF NOT EXISTS moderation_action (uid TEXT PRIMARY KEY, "
-            "created_at TEXT, updated_at TEXT, action: TEXT, original_note TEXT, "
+            "created_at TEXT, updated_at TEXT, action TEXT, original_note TEXT, "
             "current_note TEXT, active BOOL)"
         )
         cursor = self.dbconn.cursor()
@@ -43,23 +43,21 @@ class ModerationAction_DB(DBStoreIntfc):
         finally:
             cursor.close()
 
-    def save(self, action: str, note: str) -> None:
+    def save(self, event: str, action: str = "note") -> None:
         """
         Save moderation action to database.
 
         Args:
-            action: Type of action taken
-            note: Reason for moderation action
+            event: Reason for moderation action
+            action: Type of action take, defaults to 'note' action
 
         Returns:
             None
 
         Raises:
             KeyError: Missing `event_type` key in event
-            DeferredTask.IntegrityError: Non-unique `uid` provided in event
         """
         now = datetime.datetime.utcnow()
-        uid = str(uuid4())
         sql = (
             "INSERT INTO moderation_action (uid, created_at, updated_at, action, "
             "original_note, current_note, active) VALUES (?, ?, ?, ?, ?, ?, ?)"
@@ -67,7 +65,7 @@ class ModerationAction_DB(DBStoreIntfc):
 
         cursor = self.dbconn.cursor()
         try:
-            cursor.execute(sql, (uid, now, now, action, note, note, True))
+            cursor.execute(sql, (str(uuid4()), now, now, action, event, event, True))
             self.dbconn.commit()
         finally:
             cursor.close()
@@ -83,7 +81,7 @@ class ModerationAction_DB(DBStoreIntfc):
             sql = "SELECT * FROM moderation_action WHERE action=?"
             values = [action]
         else:
-            sql = "SELECT * FROM deferred_task"
+            sql = "SELECT * FROM moderation_action"
             values = []
 
         cursor = self.dbconn.cursor()
