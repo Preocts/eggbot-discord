@@ -10,9 +10,6 @@ from eggbot.provider.db_connector import DBConnection
 
 
 class DeferredTaskDB(DBStoreIntfc):
-
-    IntegrityError = DBConnection.IntegrityError
-
     def __init__(self, db_connection: DBConnection) -> None:
         """CRUD method layer for Deferred Task table"""
         self.dbconn = db_connection
@@ -26,22 +23,16 @@ class DeferredTaskDB(DBStoreIntfc):
             "created_at TEXT, retry_at TEXT, event_type TEXT, "
             "event TEXT, attempts INT)"
         )
-        cursor = self.dbconn.cursor()
-        try:
+        with self.get_cursor() as cursor:
             cursor.execute(sql)
             self.dbconn.commit()
-        finally:
-            cursor.close()
 
     def row_count(self) -> int:
         """Return total rows in deferred task table"""
         sql = "SELECT COUNT(uid) FROM deferred_task"
-        cursor = self.dbconn.cursor()
-        try:
+        with self.get_cursor() as cursor:
             cursor.execute(sql)
             return cursor.fetchone()[0]
-        finally:
-            cursor.close()
 
     def save(self, event: str, type_: str = "default", retry_after: int = 0) -> None:
         """
@@ -64,12 +55,9 @@ class DeferredTaskDB(DBStoreIntfc):
             "attempts) VALUES (?, ?, ?, ?, ?, ?)"
         )
 
-        cursor = self.dbconn.cursor()
-        try:
+        with self.get_cursor() as cursor:
             cursor.execute(sql, (str(uuid4()), now, after, type_, event, 0))
             self.dbconn.commit()
-        finally:
-            cursor.close()
 
     def get(self, event_type: str | None = None) -> list[DeferredTask]:
         """
@@ -85,12 +73,9 @@ class DeferredTaskDB(DBStoreIntfc):
             sql = "SELECT * FROM deferred_task"
             values = []
 
-        cursor = self.dbconn.cursor()
-        try:
+        with self.get_cursor() as cursor:
             cursor.execute(sql, values)
             return self._to_model(cursor.fetchall())
-        finally:
-            cursor.close()
 
     def delete(self, uid: str) -> None:
         """
@@ -103,12 +88,9 @@ class DeferredTaskDB(DBStoreIntfc):
             None
         """
         sql = "DELETE FROM deferred_task WHERE uid=?"
-        cursor = self.dbconn.cursor()
-        try:
+        with self.get_cursor() as cursor:
             cursor.execute(sql, (uid,))
             self.dbconn.commit()
-        finally:
-            cursor.close()
 
     def _to_model(self, rows: list[list[Any]]) -> list[DeferredTask]:
         """Convert rows into DeferredTask model."""

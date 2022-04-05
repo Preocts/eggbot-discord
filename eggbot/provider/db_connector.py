@@ -5,6 +5,11 @@ import dataclasses
 import sqlite3
 from typing import Generator
 
+# Explict type alias definitions for abstract from DB engine
+# Cannot be class-level until 3.10
+Cursor = sqlite3.Cursor
+IntegrityError = sqlite3.IntegrityError
+
 
 @dataclasses.dataclass
 class _ActiveConnections:
@@ -14,8 +19,6 @@ class _ActiveConnections:
 
 class DBConnection:
     """Database connection abstract. Use this over importing DB library"""
-
-    IntegrityError = sqlite3.IntegrityError
 
     def __init__(self, dbconn: sqlite3.Connection) -> None:
         self._dbconn = dbconn

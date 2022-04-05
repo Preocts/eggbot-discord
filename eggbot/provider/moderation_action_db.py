@@ -10,9 +10,6 @@ from eggbot.provider.db_connector import DBConnection
 
 
 class ModerationActionDB(DBStoreIntfc):
-
-    IntegrityError = DBConnection.IntegrityError
-
     def __init__(self, db_connection: DBConnection) -> None:
         """CRUD method layer for Moderation Action table"""
         self.dbconn = db_connection
@@ -26,22 +23,16 @@ class ModerationActionDB(DBStoreIntfc):
             "created_at TEXT, updated_at TEXT, member_id TEXT, action TEXT, "
             "original_note TEXT, current_note TEXT, active BOOL)"
         )
-        cursor = self.dbconn.cursor()
-        try:
+        with self.get_cursor() as cursor:
             cursor.execute(sql)
             self.dbconn.commit()
-        finally:
-            cursor.close()
 
     def row_count(self) -> int:
         """Return total rows in moderation action table"""
         sql = "SELECT COUNT(uid) FROM moderation_action"
-        cursor = self.dbconn.cursor()
-        try:
+        with self.get_cursor() as cursor:
             cursor.execute(sql)
             return cursor.fetchone()[0]
-        finally:
-            cursor.close()
 
     def save(self, event: str, *, member_id: str = "egg", action: str = "note") -> None:
         """
@@ -62,8 +53,7 @@ class ModerationActionDB(DBStoreIntfc):
             "VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
         )
 
-        cursor = self.dbconn.cursor()
-        try:
+        with self.get_cursor() as cursor:
             cursor.execute(
                 sql,
                 (
@@ -78,8 +68,6 @@ class ModerationActionDB(DBStoreIntfc):
                 ),
             )
             self.dbconn.commit()
-        finally:
-            cursor.close()
 
     def get(self, action: str | None = None) -> list[ModerationAction]:
         """
@@ -98,12 +86,9 @@ class ModerationActionDB(DBStoreIntfc):
             sql = "SELECT * FROM moderation_action"
             values = []
 
-        cursor = self.dbconn.cursor()
-        try:
+        with self.get_cursor() as cursor:
             cursor.execute(sql, values)
             return self._to_model(cursor.fetchall())
-        finally:
-            cursor.close()
 
     def get_by_id(
         self,
@@ -127,12 +112,9 @@ class ModerationActionDB(DBStoreIntfc):
             sql = "SELECT * FROM moderation_action WHERE member_id=?"
             values = [member_id]
 
-        cursor = self.dbconn.cursor()
-        try:
+        with self.get_cursor() as cursor:
             cursor.execute(sql, values)
             return self._to_model(cursor.fetchall())
-        finally:
-            cursor.close()
 
     def update(self, uid: str, event: str) -> None:
         """
@@ -148,12 +130,9 @@ class ModerationActionDB(DBStoreIntfc):
         now = datetime.datetime.utcnow()
         sql = "UPDATE moderation_action SET current_note=?, updated_at=? WHERE uid=?"
         values = (event, now, uid)
-        cursor = self.dbconn.cursor()
-        try:
+        with self.get_cursor() as cursor:
             cursor.execute(sql, values)
             self.dbconn.commit()
-        finally:
-            cursor.close()
 
     def delete(self, uid: str) -> None:
         """
@@ -166,12 +145,9 @@ class ModerationActionDB(DBStoreIntfc):
             None
         """
         sql = "DELETE FROM moderation_action WHERE uid=?"
-        cursor = self.dbconn.cursor()
-        try:
+        with self.get_cursor() as cursor:
             cursor.execute(sql, (uid,))
             self.dbconn.commit()
-        finally:
-            cursor.close()
 
     def deactivate(self, uid: str) -> None:
         """
@@ -184,13 +160,10 @@ class ModerationActionDB(DBStoreIntfc):
             None
         """
         sql = "UPDATE moderation_action SET active=? WHERE uid=?"
-        cursor = self.dbconn.cursor()
         values = (False, uid)
-        try:
+        with self.get_cursor() as cursor:
             cursor.execute(sql, values)
             self.dbconn.commit()
-        finally:
-            cursor.close()
 
     def _to_model(self, rows: list[list[Any]]) -> list[ModerationAction]:
         """Convert rows into DeferredTask model."""
