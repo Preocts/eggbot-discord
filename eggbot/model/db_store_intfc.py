@@ -25,8 +25,7 @@ class DBStoreIntfc(abc.ABC):
     # Override the following methods for each implementation
     @abc.abstractmethod
     def __init__(self, db_connection: DBConnection) -> None:
-        super().__init__()
-        self.dbconn = db_connection
+        self.dbconn = db_connection  # pragma: no cover
         raise NotImplementedError()
 
     @abc.abstractmethod
