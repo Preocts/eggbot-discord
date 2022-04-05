@@ -141,6 +141,25 @@ class ModerationActionDB(DBStoreIntfc):
         finally:
             cursor.close()
 
+    def deactivate(self, uid: str) -> None:
+        """
+        Mark given record as deactivated
+
+        Args:
+            uid: UID of row to deactivate
+
+        Returns:
+            None
+        """
+        sql = "UPDATE moderation_action SET active=? WHERE uid=?"
+        cursor = self.dbconn.cursor()
+        values = (False, uid)
+        try:
+            cursor.execute(sql, values)
+            self.dbconn.commit()
+        finally:
+            cursor.close()
+
     def _to_model(self, rows: list[list[Any]]) -> list[ModerationAction]:
         """Convert rows into DeferredTask model."""
-        return [ModerationAction(*row) for row in rows]
+        return [ModerationAction.from_row(*row) for row in rows]

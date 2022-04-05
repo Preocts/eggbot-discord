@@ -103,3 +103,14 @@ def test_update_event(provider: ModerationActionDB) -> None:
     assert verify.current_note == "This is a new message"
     assert verify.created_at == row.created_at
     assert verify.updated_at != row.updated_at
+
+
+def test_deactivate_action(provider: ModerationActionDB) -> None:
+    provider.save(EVENT)
+    row = provider.get()[0]
+
+    provider.deactivate(row.uid)
+    verify = provider.get()[0]
+
+    assert row.active is True
+    assert verify.active is False
