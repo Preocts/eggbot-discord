@@ -89,3 +89,16 @@ def test_delete(provider: ModerationActionDB) -> None:
     validate = provider.row_count()
 
     assert validate == 0
+
+
+def test_update_event(provider: ModerationActionDB) -> None:
+    provider.save(EVENT)
+    row = provider.get()[0]
+
+    provider.update(row.uid, "This is a new message")
+    verify = provider.get()[0]
+
+    assert verify.original_note == row.current_note
+    assert verify.current_note == "This is a new message"
+    assert verify.created_at == row.created_at
+    assert verify.updated_at != row.updated_at

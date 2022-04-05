@@ -53,9 +53,6 @@ class ModerationActionDB(DBStoreIntfc):
 
         Returns:
             None
-
-        Raises:
-            KeyError: Missing `event_type` key in event
         """
         now = datetime.datetime.utcnow()
         sql = (
@@ -88,6 +85,27 @@ class ModerationActionDB(DBStoreIntfc):
         try:
             cursor.execute(sql, values)
             return self._to_model(cursor.fetchall())
+        finally:
+            cursor.close()
+
+    def update(self, uid: str, event: str) -> None:
+        """
+        Save moderation action to database.
+
+        Args:
+            uid: UID of record to update
+            event: New reason for moderation action
+
+        Returns:
+            None
+        """
+        now = datetime.datetime.utcnow()
+        sql = "UPDATE moderation_action SET current_note=?, updated_at=? WHERE uid=?"
+        values = (event, now, uid)
+        cursor = self.dbconn.cursor()
+        try:
+            cursor.execute(sql, values)
+            self.dbconn.commit()
         finally:
             cursor.close()
 
