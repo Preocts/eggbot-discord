@@ -10,6 +10,7 @@ class ModerationAction:
     uid: str
     created_at: datetime.datetime
     updated_at: datetime.datetime
+    member_id: str
     action: str
     original_note: str
     current_note: str

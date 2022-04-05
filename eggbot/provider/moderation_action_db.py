@@ -23,8 +23,8 @@ class ModerationActionDB(DBStoreIntfc):
         """Build table if needed"""
         sql = (
             "CREATE TABLE IF NOT EXISTS moderation_action (uid TEXT PRIMARY KEY, "
-            "created_at TEXT, updated_at TEXT, action TEXT, original_note TEXT, "
-            "current_note TEXT, active BOOL)"
+            "created_at TEXT, updated_at TEXT, member_id TEXT, action TEXT, "
+            "original_note TEXT, current_note TEXT, active BOOL)"
         )
         cursor = self.dbconn.cursor()
         try:
@@ -43,12 +43,13 @@ class ModerationActionDB(DBStoreIntfc):
         finally:
             cursor.close()
 
-    def save(self, event: str, action: str = "note") -> None:
+    def save(self, event: str, *, member_id: str = "egg", action: str = "note") -> None:
         """
         Save moderation action to database.
 
         Args:
             event: Reason for moderation action
+            member_id: ID of member actions noted on. Default to 'egg', a catch-all id
             action: Type of action take, defaults to 'note' action
 
         Returns:
@@ -56,13 +57,26 @@ class ModerationActionDB(DBStoreIntfc):
         """
         now = datetime.datetime.utcnow()
         sql = (
-            "INSERT INTO moderation_action (uid, created_at, updated_at, action, "
-            "original_note, current_note, active) VALUES (?, ?, ?, ?, ?, ?, ?)"
+            "INSERT INTO moderation_action (uid, created_at, updated_at, member_id, "
+            "action, original_note, current_note, active) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
         )
 
         cursor = self.dbconn.cursor()
         try:
-            cursor.execute(sql, (str(uuid4()), now, now, action, event, event, True))
+            cursor.execute(
+                sql,
+                (
+                    str(uuid4()),
+                    now,
+                    now,
+                    member_id,
+                    action,
+                    event,
+                    event,
+                    True,
+                ),
+            )
             self.dbconn.commit()
         finally:
             cursor.close()

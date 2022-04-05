@@ -11,6 +11,7 @@ EXPECTED_COLUMNS = [
     "uid",
     "created_at",
     "updated_at",
+    "member_id",
     "action",
     "original_note",
     "current_note",
@@ -53,7 +54,7 @@ def test_table_create(provider: ModerationActionDB) -> None:
 @pytest.mark.parametrize(("row_count"), (1, 10, 100, 10_000))
 def test_save(provider: ModerationActionDB, row_count: int) -> None:
     for _ in range(row_count):
-        provider.save(EVENT, "note")
+        provider.save(EVENT, action="note")
 
     assert provider.row_count() == row_count
 
@@ -71,8 +72,8 @@ def test_get_all(provider: ModerationActionDB) -> None:
 def test_get_by_event_type(provider: ModerationActionDB) -> None:
     total = 10
     for _ in range(total):
-        provider.save(EVENT, "warn")
-        provider.save(EVENT, "ban")
+        provider.save(EVENT, action="warn")
+        provider.save(EVENT, action="ban")
 
     result01 = provider.get("warn")
     result02 = provider.get("ban")
