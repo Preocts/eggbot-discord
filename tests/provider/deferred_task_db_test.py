@@ -15,7 +15,7 @@ TASK = '{"event_type": "remind", "message": "get eggs"}'
 
 @pytest.fixture
 def provider() -> Generator[DeferredTaskDB, None, None]:
-    dbconn = DBConnection(sqlite3.connect(":memory:"))
+    dbconn = DBConnection(sqlite3.connect(DB_FILE))
     db_provider = DeferredTaskDB(dbconn)
     try:
         yield db_provider
@@ -76,7 +76,6 @@ def test_get_by_event_type(provider: DeferredTaskDB) -> None:
 
 
 def test_delete(provider: DeferredTaskDB) -> None:
-    uid = "test"
     provider.save(TASK)
     row = provider.get()[0]
 
