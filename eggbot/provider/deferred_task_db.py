@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import datetime
-import json
 from typing import Any
 from uuid import uuid4
 
@@ -44,29 +43,22 @@ class DeferredTaskDB(DBStoreIntfc):
         finally:
             cursor.close()
 
-    def save(self, event: dict[str, Any], retry_after: int = 0) -> None:
+    def save(self, event: str, type_: str = "default", retry_after: int = 0) -> None:
         """
         Save deferred task to database.
 
         Args:
-            event: Deliverable event payload to event handlers
+            event: Serialized event payload to event handlers
+            type_: Optional type classification of event
             retry_after: Number of seconds to wait, from save, before retry is attempted
 
             NOTE: retry_after only affects the first retry attempt
-            NOTE: `uid` within the event is used as a unique key. If missing
-                    a uuid is generated.
 
         Returns:
             None
-
-        Raises:
-            KeyError: Missing `event_type` key in event
-            DeferredTask.IntegrityError: Non-unique `uid` provided in event
         """
         now = datetime.datetime.utcnow()
         after = now + datetime.timedelta(seconds=retry_after)
-        uid = event.get("uid") or str(uuid4())
-        event_type = event["event_type"]
         sql = (
             "INSERT INTO deferred_task (uid, created_at, retry_at, event_type, event, "
             "attempts) VALUES (?, ?, ?, ?, ?, ?)"
@@ -74,7 +66,7 @@ class DeferredTaskDB(DBStoreIntfc):
 
         cursor = self.dbconn.cursor()
         try:
-            cursor.execute(sql, (uid, now, after, event_type, json.dumps(event), 0))
+            cursor.execute(sql, (str(uuid4()), now, after, type_, event, 0))
             self.dbconn.commit()
         finally:
             cursor.close()

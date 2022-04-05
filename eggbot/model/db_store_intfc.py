@@ -16,6 +16,11 @@ class DBStoreIntfc(abc.ABC):
         raise NotImplementedError()
 
     @abc.abstractmethod
+    def save(self, event: str) -> None:
+        """Override for database specific save method"""
+        raise NotImplementedError()
+
+    @abc.abstractmethod
     def delete(self, uid: str) -> None:
         """Override for database specific delete method"""
         raise NotImplementedError()

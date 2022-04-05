@@ -1,3 +1,4 @@
+import json
 import sqlite3
 from typing import Generator
 
@@ -9,11 +10,12 @@ from eggbot.provider.deferred_task_db import DeferredTaskDB
 DB_FILE = ":memory:"
 EXPECTED_COLUMNS = ["uid", "created_at", "retry_at", "event_type", "event", "attempts"]
 TABLE_NAME = "deferred_task"
+TASK = '{"event_type": "remind", "message": "get eggs"}'
 
 
 @pytest.fixture
 def provider() -> Generator[DeferredTaskDB, None, None]:
-    dbconn = DBConnection(sqlite3.connect(":memory:"))
+    dbconn = DBConnection(sqlite3.connect(DB_FILE))
     db_provider = DeferredTaskDB(dbconn)
     try:
         yield db_provider
@@ -43,27 +45,17 @@ def test_table_create(provider: DeferredTaskDB) -> None:
 
 @pytest.mark.parametrize(("row_count"), (1, 10, 100, 10_000))
 def test_save(provider: DeferredTaskDB, row_count: int) -> None:
-    task = {"event_type": "remind", "message": "get eggs"}
 
     for _ in range(row_count):
-        provider.save(task, 100)
+        provider.save(TASK, "testing", 100)
 
     assert provider.row_count() == row_count
 
 
-def test_save_with_uid_error(provider: DeferredTaskDB) -> None:
-    task = {"event_type": "remind", "message": "get eggs", "uid": "0"}
-    provider.save(task)
-
-    with pytest.raises(provider.IntegrityError):
-        provider.save(task)
-
-
 def test_get_all(provider: DeferredTaskDB) -> None:
     total = 10
-    task = {"event_type": "remind", "message": "get eggs"}
     for _ in range(total):
-        provider.save(task)
+        provider.save(TASK)
 
     results = provider.get()
 
@@ -72,11 +64,9 @@ def test_get_all(provider: DeferredTaskDB) -> None:
 
 def test_get_by_event_type(provider: DeferredTaskDB) -> None:
     total = 10
-    task01 = {"event_type": "remind", "message": "get eggs"}
-    task02 = {"event_type": "announce", "message": "get eggs"}
     for _ in range(total):
-        provider.save(task01)
-        provider.save(task02)
+        provider.save(TASK, "remind")
+        provider.save(TASK, "announce")
 
     result01 = provider.get("remind")
     result02 = provider.get("announce")
@@ -86,13 +76,10 @@ def test_get_by_event_type(provider: DeferredTaskDB) -> None:
 
 
 def test_delete(provider: DeferredTaskDB) -> None:
-    uid = "test"
-    task = {"event_type": "remind", "message": "get eggs", "uid": uid}
-    provider.save(task)
-    prevalidate = provider.row_count()
+    provider.save(TASK)
+    row = provider.get()[0]
 
-    provider.delete(uid)
+    provider.delete(row.uid)
     validate = provider.row_count()
 
-    assert prevalidate == 1
     assert validate == 0
