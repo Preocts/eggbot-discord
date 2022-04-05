@@ -1,14 +1,16 @@
 import abc
 from typing import Any
 
+from eggbot.provider.db_connector import DBConnection
+
 
 class DBStoreIntfc(abc.ABC):
     """ABC for all database store providers"""
 
-    # @abc.abstractmethod
-    # def save(self) -> None:
-    #     """Override for database specific save method"""
-    #     raise NotImplementedError()
+    @abc.abstractmethod
+    def __init__(self, db_connection: DBConnection) -> None:
+        super().__init__()
+        raise NotImplementedError()
 
     @abc.abstractmethod
     def get(self) -> list[Any]:
