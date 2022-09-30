@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import random
 from datetime import datetime
 from typing import Any
@@ -7,7 +9,6 @@ import pytest
 
 from eggbot.model.chat_message import ChatMessage
 from eggbot.module.keyword_notifi import KeywordNotifi
-from eggbot.module.keyword_notifi import KeywordNotifiConfig
 
 random.seed()
 
@@ -53,8 +54,8 @@ def module() -> Generator[KeywordNotifi, None, None]:
 @pytest.mark.parametrize(
     ("message", "expected"),
     (
-        ("you don't have to test all your code, only the parts that you want to work.", False),
-        ("bent pipes <>, curly bois {}, staples [], pillows (), from-the-windows, to-the-walls /", False),
+        ("you don't have to test all your code, only the parts that you want to work.", False),  # noqa: E501
+        ("bent pipes <>, curly bois {}, staples [], pillows (), from-the-windows, to-the-walls /", False),  # noqa: E501
         (f"{MATCH_WORD01} is a icon of the USD currency", True),
         (f"One could say {MATCH_WORD01}'s is the icon", True),
         (f"It wasn't like {MATCH_WORD02} had any choice", True),

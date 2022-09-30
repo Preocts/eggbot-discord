@@ -1,4 +1,6 @@
 """Common helper methods for strings."""
+from __future__ import annotations
+
 import re
 
 
