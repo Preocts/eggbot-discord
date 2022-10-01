@@ -35,3 +35,12 @@ jobs:
           flags: tests-${{ matrix.os }}-${{ matrix.python-version }}
           name: codecov-umbrella
           verbose: true
+
+  success-on-all-tests:
+    needs: build
+    runs-on: ubuntu-latest
+    name: Build and tests successful
+    steps:
+      - name: Pass
+        run: |
+          echo Egg
