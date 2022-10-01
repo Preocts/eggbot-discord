@@ -1,4 +1,6 @@
 """Abstracts details of a chat message from Discord provider."""
+from __future__ import annotations
+
 import dataclasses
 
 

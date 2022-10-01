@@ -1,9 +1,9 @@
-import json
+from __future__ import annotations
+
 import sqlite3
 from typing import Generator
 
 import pytest
-
 from eggbot.provider.db_connector import DBConnection
 from eggbot.provider.deferred_task_db import DeferredTaskDB
 
