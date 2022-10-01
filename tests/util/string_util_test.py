@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import pytest
-
 from eggbot.util.string_util import StringUtil
 
 

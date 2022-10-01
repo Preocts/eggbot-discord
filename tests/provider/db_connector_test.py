@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import Generator
 
 import pytest
-
 from eggbot.provider.db_connector import DBConnection
 from eggbot.provider.db_connector import DBConnector
 

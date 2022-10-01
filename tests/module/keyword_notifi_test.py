@@ -6,7 +6,6 @@ from typing import Any
 from typing import Generator
 
 import pytest
-
 from eggbot.model.chat_message import ChatMessage
 from eggbot.module.keyword_notifi import KeywordNotifi
 

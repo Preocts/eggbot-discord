@@ -5,7 +5,6 @@ import time
 from typing import Generator
 
 import pytest
-
 from eggbot.provider.db_connector import DBConnection
 from eggbot.provider.moderation_action_db import ModerationActionDB
 
