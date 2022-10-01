@@ -7,10 +7,11 @@ on:
     branches: [main]
 
 jobs:
-  build:
+  build-and-test:
+    name: "Build and test package"
     strategy:
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]
+        os: [windows-latest, ubuntu-latest]
         python-version: ["3.8", "3.9", "3.10"]
       fail-fast: false
 
@@ -25,19 +26,9 @@ jobs:
         run: python -m pip install --upgrade pip tox
       - name: Run tox
         run: tox -e py
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v2
-        with:
-          directory: "."
-          env_vars: OS,PYTHON
-          fail_ci_if_error: false
-          files: ./coverage.xml
-          flags: tests-${{ matrix.os }}-${{ matrix.python-version }}
-          name: codecov-umbrella
-          verbose: true
 
   success-on-all-tests:
-    needs: build
+    needs: build-and-test
     runs-on: ubuntu-latest
     name: Build and tests successful
     steps:
