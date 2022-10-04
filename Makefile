@@ -6,6 +6,12 @@ init:
 install:
 	python -m pip install --upgrade .
 
+.PHONY: upgrade-dev
+upgrade-dev:
+	python -m pip install pip-tools
+	pip-compile --upgrade
+	python -m pip install --upgrade --editable .[dev,test]
+
 .PHONY: install-dev
 install-dev:
 	python -m pip install --editable .[dev,test]
