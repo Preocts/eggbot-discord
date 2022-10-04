@@ -156,6 +156,7 @@ Makefile.
 | `install`         | install the project                                                   |
 | `install-test`    | install test requirements and project as editable install             |
 | `install-dev`     | install development/test requirements and project as editable install |
+| `upgrade-dev`     | update all dependencies, regenerate requirements.txt                  |
 | `build-dist`      | Build source distribution and wheel distribution                      |
 | `clean-artifacts` | Deletes python/mypy artifacts, cache, and pyc files                   |
 | `clean-tests`     | Deletes tox, coverage, and pytest artifacts                           |
