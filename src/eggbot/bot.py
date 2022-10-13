@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import discord
 from discord.ext import commands
+from discord.ext.commands import CommandError
 from discord.ext.commands import Context
 from runtime_yolk import Yolk
 
@@ -17,25 +18,35 @@ intents.message_content = runtime.config.getboolean("INTENTS", "message_content"
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 
-@bot.event
+async def is_correct_guild(ctx: Context) -> bool:
+    """Check that command is run in correct guild."""
+    return ctx.guild.id == runtime.config.getint("GUILD", "id")
+
+
+@bot.listen()
+async def on_command_error(ctx: Context, error: CommandError) -> None:
+    """Handle command error."""
+    logger.warning("Error captured in %s - %s", ctx.guild.id, error)
+
+
+@bot.listen()
 async def on_ready() -> None:
     """Simple console logging indicating ready event has fired."""
-    logger.info("Eggbot has successfully loaded. In %s as %s", bot.guilds, bot.user.id)
+    guilds = [guild.name for guild in bot.guilds]
+    logger.info("Eggbot has successfully loaded. In %s as %s", guilds, bot.user.id)
 
 
 @bot.command()
+@commands.check(is_correct_guild)
 async def hello(ctx: Context) -> None:
     logger.info("Eggbot hello command recieved. Hello there!")
-    if ctx.guild.id != runtime.config.get("GUILD", "id"):
-        logger.warning("Listening to the wrong guild! %s", ctx.channel.guild.name)
     await ctx.channel.send(f"Hello to you as well, {ctx.author.mention}!")
 
 
 @bot.command()
+@commands.check(is_correct_guild)
 async def shutdown(ctx: Context) -> None:
     logger.info("Eggbot shutdown command recieved.  Until next time, space cowboy.")
-    if ctx.guild.id != runtime.config.get("GUILD", "id"):
-        logger.warning("Listening to the wrong guild! %s", ctx.channel.guild.name)
     await ctx.channel.send(f"See you next time, {ctx.author.mention}.")
     await bot.close()
 
