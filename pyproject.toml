@@ -47,8 +47,8 @@ homepage = "https://github.com/Preocts/eggbot-discord"
 # changelog = ""
 
 # CLI scripts if needed
-# [project.scripts]
-# python-src-example = "module_name.sample:main"
+[project.scripts]
+eggbot-run = "eggbot.bot:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]  # ["."] by default
