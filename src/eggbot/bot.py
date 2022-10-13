@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import os
-
 import discord
 from discord.ext import commands
 from discord.ext.commands import Context
@@ -9,14 +7,13 @@ from runtime_yolk import Yolk
 
 
 # Initialize runtime and bot client
-runtime = Yolk()
-runtime.set_logging("DEBUG")
-runtime.load_env()
+runtime = Yolk(auto_load=True)
 logger = runtime.get_logger(__name__)
 
 intents = discord.Intents.default()
-intents.members = True
-intents.message_content = True
+intents.presences = runtime.config.getboolean("INTENTS", "presences")
+intents.members = runtime.config.getboolean("INTENTS", "members")
+intents.message_content = runtime.config.getboolean("INTENTS", "message_content")
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 
@@ -29,7 +26,7 @@ async def on_ready() -> None:
 @bot.command()
 async def hello(ctx: Context) -> None:
     logger.info("Eggbot hello command recieved. Hello there!")
-    if ctx.guild.id != 190604982934831104:
+    if ctx.guild.id != runtime.config.get("GUILD", "id"):
         logger.warning("Listening to the wrong guild! %s", ctx.channel.guild.name)
     await ctx.channel.send(f"Hello to you as well, {ctx.author.mention}!")
 
@@ -37,11 +34,16 @@ async def hello(ctx: Context) -> None:
 @bot.command()
 async def shutdown(ctx: Context) -> None:
     logger.info("Eggbot shutdown command recieved.  Until next time, space cowboy.")
-    if ctx.guild.id != 190604982934831104:
+    if ctx.guild.id != runtime.config.get("GUILD", "id"):
         logger.warning("Listening to the wrong guild! %s", ctx.channel.guild.name)
     await ctx.channel.send(f"See you next time, {ctx.author.mention}.")
     await bot.close()
 
 
+def main() -> int:
+    bot.run(runtime.config.get("DEFAULT", "discord_token"))
+    return 0
+
+
 if __name__ == "__main__":
-    bot.run(os.getenv("DISCORD_TOKEN"))
+    raise SystemExit(main())
