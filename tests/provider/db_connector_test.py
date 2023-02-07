@@ -38,5 +38,4 @@ def test_get_connection(provider: DBConnector) -> None:
 def test_cached_connection(provider: DBConnector) -> None:
     with provider.get_connection(DB_FILE) as connection01:
         with provider.get_connection(DB_FILE) as connection02:
-
             assert connection02._dbconn is connection01._dbconn
