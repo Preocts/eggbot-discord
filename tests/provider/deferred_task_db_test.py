@@ -45,7 +45,6 @@ def test_table_create(provider: DeferredTaskDB) -> None:
 
 @pytest.mark.parametrize(("row_count"), (1, 10, 100, 10_000))
 def test_save(provider: DeferredTaskDB, row_count: int) -> None:
-
     for _ in range(row_count):
         provider.save(TASK, "testing", 100)
 
